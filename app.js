@@ -1,8 +1,23 @@
 const express = require("express");
 const app = express();
 const port = process.env.PORT || 3001;
+const { MessagingResponse } = require('twilio').twiml;
 
 app.get("/", (req, res) => res.type('html').send(html));
+
+app.post('/verify', (req, res, next) => {
+
+    // Check if the Authorization header is present
+  if (req.headers.authorization) {
+    // Authorization header is present
+    let message = new MessagingResponse().message("Nice!");
+    res.set('Content-Type', 'text/xml');
+    res.send(message.toString()).status(200);
+  } else {
+    res.set('WWW-Authenticate', `Basic realm="localhosttest"`);
+    res.status(401).json({ error: 'Unauthorized' }); // Send a 401 Unauthorized response with a JSON error message
+  }
+})
 
 const server = app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
